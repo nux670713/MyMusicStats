@@ -1,61 +1,172 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+MyMusicStats
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+1. Introduzione
 
-## About Laravel
+MyMusicStats è un'applicazione web che consente agli utenti di analizzare e condividere le proprie statistiche musicali. Sfrutta l'integrazione con Spotify per recuperare informazioni personali sull’ascolto musicale e presenta un'interfaccia interattiva con funzionalità sociali come post, reazioni e feed condivisi.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+2. Stack Tecnologico
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+* Backend: Laravel 10 (PHP 8.2+)
+* Frontend: Blade templates, JavaScript, jQuery
+* Database: MySQL
+* Librerie:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+  * Chart.js per la visualizzazione grafica
+  * Bootstrap per il design responsive
+  * Font Awesome per le icone
+* API esterne: Spotify Web API (OAuth2)
 
-## Learning Laravel
+3. Struttura del Database
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Il database principale include le seguenti tabelle:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+* utenti: informazioni sul profilo dell'utente (username, Spotify ID, avatar, ecc.)
+* amicizie: gestione delle relazioni tra utenti (id\_mittente, id\_destinatario, status)
+* posts: contiene i post pubblicati, compresi tipo e contenuto JSON
+* post\_reactions: mappa le reazioni degli utenti ai post (like, love, ecc.)
+* brani\_recenti: ultimi brani ascoltati (caching)
+* top\_tracks: brani più ascoltati per ciascun utente
+* top\_artists: artisti più ascoltati per ciascun utente
+* generi: generi musicali derivati dagli artisti ascoltati
+* altri eventuali: audio features, statistiche aggregate
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+4. Funzionalità Principali
 
-## Laravel Sponsors
+4.1 Autenticazione via Spotify
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Gli utenti accedono tramite OAuth2 usando il proprio account Spotify. L’app salva i token temporanei e li utilizza per interrogare l’API.
 
-### Premium Partners
+4.2 Dashboard Personale
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+Dopo il login, l'utente accede a una dashboard dinamica che mostra:
 
-## Contributing
+* Artisti e brani top per intervalli (4 settimane, 6 mesi, 1 anno)
+* Generi musicali predominanti (grafico a torta con massimo 10 generi)
+* Minuti ascoltati totali (stima)
+* Cronologia degli ascolti recenti
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+La dashboard è caricata in modalità SPA (Single Page Application), con sezioni navigabili dinamicamente tramite sidebar.
 
-## Code of Conduct
+4.3 Feed e Post
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Ogni utente può condividere contenuti sotto forma di post nel proprio feed o in quello degli amici. Tipologie di post supportate:
 
-## Security Vulnerabilities
+* 🎵 track: “Sto ascoltando ‘Blinding Lights’ di The Weeknd”
+* 🎤 artist: “Il mio artista più ascoltato è Taylor Swift”
+* 📈 stat: “Ho ascoltato 1200 minuti di musica questo mese”
+* 💽 album: “Il mio album top è ‘After Hours’”
+* 🧩 genre: “I miei generi più ascoltati sono Pop e Rock”
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Ogni post ha:
 
-## License
+* type: tipo di post
+* content: oggetto JSON con dati o messaggio
+* id\_utente: autore
+* created\_at: data di creazione
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+4.4 Reazioni ai Post
+
+Gli utenti possono reagire ai post con una delle seguenti reazioni:
+
+* like
+* love
+* laugh
+* angry
+
+Una reazione è associata a un singolo utente e un singolo post, ed è gestita con un toggle: cliccando nuovamente sulla stessa reazione, questa viene rimossa.
+
+4.5 Feed Amici
+
+La sezione “Post Feed” mostra:
+
+* I propri post
+* I post degli amici con status “accepted”
+
+I post sono ordinati per data di creazione decrescente. Ogni post mostra il numero di reazioni e i dati dell’utente che lo ha pubblicato.
+
+4.6 Ricerca e Richiesta Amicizia
+
+Un utente può cercare amici tramite il loro Spotify ID e inviare una richiesta. Le richieste sono gestite da:
+
+* pending: in attesa
+* accepted: accettata
+* rejected: rifiutata
+
+Nella topbar è presente un'icona campanella con un badge che segnala il numero di richieste in sospeso.
+
+4.7 SPA Navigation
+
+La dashboard è gestita tramite un sistema JavaScript che:
+
+* Mostra una sola sezione alla volta
+* Aggiorna la URL via pushState
+* Supporta il pulsante “indietro” del browser
+* Carica dinamicamente le sezioni post-feed e lista-amici
+
+5. API Endpoints
+
+POST /api/posts
+Crea un nuovo post
+Body JSON:
+{
+"type": "track",
+"content": {
+"message": "Sto ascoltando 'Blinding Lights' di The Weeknd"
+}
+}
+
+POST /api/posts/{id}/react
+Aggiunge o rimuove una reazione al post
+
+GET /api/posts/feed
+Recupera tutti i post dell’utente e dei suoi amici
+
+GET /api/friends/list
+Lista degli amici
+
+GET /api/friend-requests/pending
+Restituisce il numero di richieste di amicizia in sospeso
+
+GET /api/spotify/top-genres
+Restituisce la lista dei generi principali dell’utente
+
+GET /api/spotify/top-tracks
+Restituisce la lista dei brani top
+
+GET /api/spotify/top-artists
+Restituisce la lista degli artisti top
+
+GET /api/spotify/recently-played
+Restituisce la cronologia di ascolto
+
+6. Comportamenti Dinamici JS
+
+* Script dashboard.js gestisce caricamento asincrono dei dati e rendering dei grafici
+* Script social.js gestisce feed, ricerca amici, invio richieste e reazioni
+* Script sidebar-navigation.js gestisce navigazione interna SPA
+* Gli script sono caricati nella dashboard in <script defer> o prima di </body>
+
+7. Sicurezza
+
+* Accesso protetto da OAuth2
+* Gli endpoint API richiedono token di autenticazione
+* Ogni utente può modificare solo i propri post e dati
+
+8. Espandibilità futura
+
+* Paginazione e caricamento lazy per feed e liste
+* Aggiunta di commenti ai post
+* Notifiche in tempo reale via Laravel Echo
+* Integrazione con ulteriori fonti musicali (es. YouTube Music)
+
+9. Screenshot (facoltativi in Google Docs)
+
+* Dashboard
+* Feed post
+* Condivisione post
+* Notifiche amicizia
+* Statistiche
+
+10. Conclusioni
+
+MyMusicStats è una piattaforma incentrata sull’analisi musicale personale e l’interazione sociale. Combina visualizzazione dati, API musicali e funzionalità social per offrire un'esperienza coinvolgente e personalizzata all’utente.

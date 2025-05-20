@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
-use App\Models\Utenti; 
+use App\Models\Utenti;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -15,12 +15,12 @@ class AuthController extends Controller
     {
         /** @disregard P1009 Undefined method */
         return Socialite::driver('spotify')
-            ->scopes(['user-read-email', 'user-read-private','user-top-read', 'user-read-recently-played'])    
-        ->redirect()
-            ;
+            ->scopes(['user-read-email', 'user-read-private', 'user-top-read', 'user-read-recently-played'])
+            ->redirect()
+        ;
     }
 
-   
+
     public function getToken()
     {
         if (Auth::check()) {

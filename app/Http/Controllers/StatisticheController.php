@@ -9,32 +9,25 @@ use Illuminate\Support\Facades\Log;
 
 class StatisticheController extends Controller
 {
-    /**
-     * Ottieni gli header di autorizzazione per Spotify
-     *
-     * @return array
-     */
     private function getSpotifyHeaders()
     {
         $user = Auth::user();
-        $accessToken = $user->spotify_token;
+        $accessToken = $user?->access_token;
+
+        if (!$accessToken) {
+            throw new \Exception("Token Spotify mancante");
+        }
 
         return [
             'Authorization' => 'Bearer ' . $accessToken,
         ];
     }
 
-    /**
-     * Effettua una richiesta all'API di Spotify
-     *
-     * @param string $endpoint
-     * @param array $params
-     * @return array|null
-     */
     private function spotifyRequest($endpoint, $params = [])
     {
         try {
-            $headers = $this->getSpotifyHeaders();
+            $user = Auth::user();
+            $accessToken = $user->getValidAccessToken(); // usa il tuo metodo per rigenerare il token se serve
 
             if (isset($params['time_range']) && !in_array($params['time_range'], ['short_term', 'medium_term', 'long_term'])) {
                 $params['time_range'] = 'medium_term';
@@ -44,7 +37,7 @@ class StatisticheController extends Controller
                 $params['limit'] = min(max(1, (int) $params['limit']), 50);
             }
 
-            $response = Http::withHeaders($headers)->get("https://api.spotify.com/v1/{$endpoint}", $params);
+            $response = Http::withToken($accessToken)->get("https://api.spotify.com/v1/{$endpoint}", $params);
 
             if ($response->successful()) {
                 return $response->json();
@@ -79,6 +72,7 @@ class StatisticheController extends Controller
             'external_url' => $track['external_urls']['spotify'] ?? null,
         ];
     }
+
 
     public function getTopTracks(Request $request)
     {

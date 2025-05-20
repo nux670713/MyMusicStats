@@ -159,6 +159,6 @@ Restituisce la cronologia di ascolto
 * Notifiche in tempo reale via Laravel Echo
 * Integrazione con ulteriori fonti musicali (es. YouTube Music)
 
-10. Conclusioni
+9. Conclusioni
 
 MyMusicStats è una piattaforma incentrata sull’analisi musicale personale e l’interazione sociale. Combina visualizzazione dati, API musicali e funzionalità social per offrire un'esperienza coinvolgente e personalizzata all’utente.

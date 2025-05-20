@@ -41,11 +41,10 @@ Gli utenti accedono tramite OAuth2 usando il proprio account Spotify. L’app sa
 Dopo il login, l'utente accede a una dashboard dinamica che mostra:
 
 * Artisti e brani top per intervalli (4 settimane, 6 mesi, 1 anno)
-* Generi musicali predominanti (grafico a torta con massimo 10 generi)
-* Minuti ascoltati totali (stima)
+* Generi musicali predominanti (grafico a torta)
 * Cronologia degli ascolti recenti
 
-La dashboard è caricata in modalità SPA (Single Page Application), con sezioni navigabili dinamicamente tramite sidebar.
+La dashboard è caricata in modalità SPA (Single Page Application), con sezioni navigabili dinamicamente tramite sidebar e top bar.
 
 4.3 Feed e Post
 
@@ -80,7 +79,7 @@ Una reazione è associata a un singolo utente e un singolo post, ed è gestita c
 La sezione “Post Feed” mostra:
 
 * I propri post
-* I post degli amici con status “accepted”
+* I post degli amici con status “accepted” (gli amici che hanno accettato la nostra richiesta di amicizia)
 
 I post sono ordinati per data di creazione decrescente. Ogni post mostra il numero di reazioni e i dati dell’utente che lo ha pubblicato.
 
@@ -99,9 +98,7 @@ Nella topbar è presente un'icona campanella con un badge che segnala il numero 
 La dashboard è gestita tramite un sistema JavaScript che:
 
 * Mostra una sola sezione alla volta
-* Aggiorna la URL via pushState
-* Supporta il pulsante “indietro” del browser
-* Carica dinamicamente le sezioni post-feed e lista-amici
+* Carica dinamicamente tutte le sezioni
 
 5. API Endpoints
 
@@ -161,4 +158,4 @@ Restituisce la cronologia di ascolto
 
 9. Conclusioni
 
-MyMusicStats è una piattaforma incentrata sull’analisi musicale personale e l’interazione sociale. Combina visualizzazione dati, API musicali e funzionalità social per offrire un'esperienza coinvolgente e personalizzata all’utente.
+MyMusicStats è una piattaforma incentrata sull’analisi musicale personale e l’interazione sociale. Combina visualizzazione dati, API e funzionalità social per offrire un'esperienza coinvolgente e speciale all’utente.

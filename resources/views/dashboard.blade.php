@@ -13,19 +13,95 @@
 
         <!-- Font Awesome -->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
-        <!-- Chart.js -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.css" rel="stylesheet">
-
         <!-- jQuery -->
         <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 
         <!-- Chart.js -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        <script src="{{ asset('assets/js/dashboard.js') }}"></script>
-        <link href="{{ asset('assets/css/dashboard.css') }}" rel="stylesheet">
+        <script src="/assets/js/dashboard.js"></script>
+        <link href="/assets/css/dashboard.css" rel="stylesheet">
     </head>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Condividi Top Artisti (passa tutta la lista)
+            document.querySelectorAll('.share-top-artists').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    // Prendi tutti i nomi degli artisti dalla lista
+                    const artistEls = document.querySelectorAll('#top-artists .artist-info p');
+                    const artists = Array.from(artistEls).map(el => el.textContent.trim()).filter(Boolean);
+                    if (artists.length) {
+                        const params = artists.map(a => `content[]=${encodeURIComponent(a)}`).join('&');
+                        window.location.href = `{{ route('crea-post') }}?selected=topartist&type=artista&${params}`;
+                    }
+                });
+            });
+        
+            // Condividi Top Brani (passa tutta la lista: titolo e artista alternati)
+            document.querySelectorAll('.share-top-tracks').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    // Prendi tutti i brani dalla lista
+                    const trackEls = document.querySelectorAll('#top-tracks .track-info p');
+                    const tracks = [];
+                    Array.from(trackEls).forEach(el => {
+                        // Supponiamo formato: "Titolo - Artista"
+                        const [title, artist] = el.textContent.split(' - ');
+                        if (title && artist) {
+                            tracks.push(title.trim(), artist.trim());
+                        }
+                    });
+                    if (tracks.length) {
+                        const params = tracks.map(t => `content[]=${encodeURIComponent(t)}`).join('&');
+                        window.location.href = `{{ route('crea-post') }}?selected=toptrack&type=brano&${params}`;
+                    }
+                });
+            });
+        
+            // Condividi Ascoltati di Recente (passa tutta la lista: titolo e artista alternati)
+            document.querySelectorAll('.share-recent-track').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    // Prendi tutti i brani ascoltati di recente
+                    const trackEls = document.querySelectorAll('#recently-played .track-info p');
+                    const tracks = [];
+                    Array.from(trackEls).forEach(el => {
+                        // Supponiamo formato: "Titolo - Artista"
+                        const [title, artist] = el.textContent.split(' - ');
+                        if (title && artist) {
+                            tracks.push(title.trim(), artist.trim());
+                        }
+                    });
+                    if (tracks.length) {
+                        const params = tracks.map(t => `content[]=${encodeURIComponent(t)}`).join('&');
+                        window.location.href = `{{ route('crea-post') }}?selected=recentlyplayed&type=ascoltato_di_recente&${params}`;
+                    }
+                });
+            });
+        
+            // Condividi Top Generi (passa tutta la lista)
+            document.querySelectorAll('.share-top-genre').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    // Prendi tutti i generi dalla legenda o dalla lista
+                    // Adatta il selettore secondo la tua struttura
+                    const genreEls = document.querySelectorAll('#genres-chart .legend-label, #genres-chart li, #genres-chart span');
+                    const genres = Array.from(genreEls).map(el => el.textContent.trim()).filter(Boolean);
+                    // Se non trovi nulla, prova a prendere le chiavi da un oggetto JS globale (es. window.lastGenres)
+                    if (!genres.length && window.lastGenres) {
+                        for (const g in window.lastGenres) {
+                            genres.push(g);
+                        }
+                    }
+                    if (genres.length) {
+                        const params = genres.map(g => `content[]=${encodeURIComponent(g)}`).join('&');
+                        window.location.href = `{{ route('crea-post') }}?selected=genere&type=genere&${params}`;
+                    }
+                });
+            });
+        });
+        </script>
 
     <body>
         <!-- Navbar -->
@@ -39,7 +115,6 @@
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item"><a class="nav-link nav-link-page active" href="#dashboard">Dashboard</a>
                         </li>
-                        <li class="nav-item"><a class="nav-link nav-link-page" href="#statistiche">Statistiche</a></li>
                         <li class="nav-item"><a class="nav-link nav-link-page" href="#ricerca-amici">Ricerca Amici</a>
                         </li>
                         <li class="nav-item"><a class="nav-link nav-link-page" href="#lista-amici">I tuoi Amici</a></li>
@@ -108,8 +183,7 @@
                             <h5 class="mb-3">Menu</h5>
                             <a href="#dashboard" class="sidebar-link nav-link-page active"><i class="fas fa-home"></i>
                                 Dashboard</a>
-                            <a href="#statistiche" class="sidebar-link nav-link-page"><i class="fas fa-chart-line"></i>
-                                Statistiche</a>
+                               
                             <h5 class="mt-4 mb-3">Social</h5>
                             <a href="#ricerca-amici" class="sidebar-link nav-link-page"><i class="fas fa-user-plus"></i>
                                 Ricerca Amici</a>
@@ -147,7 +221,7 @@
                                     <div class="filter-option" data-period="long_term">Anno</div>
                                 </div>
 
-                                <!-- Recently Played -->
+                                
 
                                 <div class="section-header">
                                     <h2>Le Tue Top Statistiche</h2>
@@ -170,9 +244,8 @@
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-dark"
                                                         aria-labelledby="artistsDropdown">
-                                                        
                                                         <li>
-                                                            <a class="dropdown-item" href="{{ route('crea-post') }}">Condividi</a>
+                                                            <a class="dropdown-item share-top-artists" href="#">Condividi</a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -202,9 +275,8 @@
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-dark"
                                                         aria-labelledby="tracksDropdown">
-                                                        
                                                         <li>
-                                                            <a class="dropdown-item" href="#">Condividi</a>
+                                                            <a class="dropdown-item share-top-tracks" href="#">Condividi</a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -235,7 +307,7 @@
                                                     <ul class="dropdown-menu dropdown-menu-dark"
                                                         aria-labelledby="trendsDropdown">
                                                         <li>
-                                                            <a class="dropdown-item" href="#">Condividi</a>
+                                                            <a class="dropdown-item share-recent-track">Condividi</a>
                                                         </li>
                                                        
                                                     </ul>
@@ -268,8 +340,7 @@
                                                         aria-labelledby="genresDropdown">
                                                         
                                                         <li>
-                                                            <a class="dropdown-item" href="#">Analisi
-                                                                dettagliata</a>
+                                                            <a class="dropdown-item share-top-genre" href="#">Condividi</a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -292,10 +363,7 @@
 
                         </div>
 
-                        <div id="statistiche" class="page-section" style="display:none;">
-                            <h1>Statistiche Musicali</h1>
-                            <p>Qui troverai grafici e dati sui tuoi ascolti.</p>
-                        </div>
+                        
 
                         <div id="ricerca-amici" class="page-section" style="display:none;">
                             <h1>Ricerca Amici</h1>
@@ -327,7 +395,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
         <!-- Navigazione e API -->
-        <script src="{{ asset('assets/js/social.js') }}"></script>
+        <script src="/assets/js/social.js"></script>
     </body>
 
 </html>

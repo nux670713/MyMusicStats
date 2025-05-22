@@ -6,7 +6,6 @@ use App\Http\Controllers\SpotifyApiController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UtentiController;
-use App\Http\Controllers\StatisticheController;
 
 Route::middleware(['web'])->get('/auth/api-token', [AuthController::class, 'getToken']);
 
@@ -41,13 +40,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/post/{id}/MyReaction', [PostController::class, 'getMyReaction'])->name('post.myreaction');
 
     Route::get('/users/list/{username}', [AmicizieController::class, 'listByName']);
-
-    Route::get('/statistiche/top-tracks', [StatisticheController::class, 'getTopTracks']);
-    Route::get('/statistiche/top-artists', [StatisticheController::class, 'getTopArtists']);
-    Route::get('/statistiche/top-genres', [StatisticheController::class, 'getTopGenres']);
-    Route::get('/statistiche/audio-features', [StatisticheController::class, 'getAudioFeatures']);
-    Route::get('/statistiche/audio-features-average', [StatisticheController::class, 'getAudioFeaturesAverage']);
-    Route::get('/statistiche/extreme-tracks', [StatisticheController::class, 'getExtremeTracks']);
 
 
 });

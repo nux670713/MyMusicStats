@@ -21,7 +21,7 @@ public function createPost(Request $request)
 {
     if ($request->isMethod('post')) {
         $request->validate([
-            'type' => 'required|string|in:track,artist,stat,album,genre', // Tipi di post validi
+            'type' => 'required|string', // Tipi di post validi
             'content' => 'required|array', // Contenuto in formato JSON
         ]);
 

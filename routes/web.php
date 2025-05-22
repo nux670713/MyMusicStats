@@ -16,7 +16,6 @@ use SocialiteProviders\Manager\SocialiteWasCalled;
 use SocialiteProviders\Spotify\SpotifyExtendSocialite;
 use Laravel\Socialite\Contracts\Factory as SocialiteFactory;
 use Laravel\Socialite\Facades\Socialite;
-use App\Http\Controllers\StatisticheController;
 use App\Models\Post;
 
 // Benvenuto
@@ -72,9 +71,6 @@ Route::get('auth/spotify/callback', function () {
 Route::get('/auth/spotify/redirect2', function () {
     return redirect()->route('spotify.redirect');
 })->name('login');
-
-Route::middleware('auth')->get('/statistiche', [StatisticheController::class, 'index']);
-
 
 
 

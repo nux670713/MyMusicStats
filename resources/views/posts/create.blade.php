@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>MyMusicStats - Crea Post</title>
     <!-- Bootstrap CSS -->
@@ -62,71 +62,129 @@
         }
     </style>
 </head>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('createPostForm');
-    const postType = document.getElementById('postType');
-    const postTitle = document.getElementById('postTitle');
-    const postContent = document.getElementById('postContent');
-    const charCount = document.getElementById('charCount');
-    const responseMessage = document.getElementById('responseMessage');
-
-    // Aggiorna il contatore caratteri
-    postContent.addEventListener('input', function () {
-        charCount.textContent = `${postContent.value.length}/500`;
-    });
-
-    form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        responseMessage.innerHTML = '';
-
-        // Prepara il body secondo il controller (type, content)
-        const type = postType.value;
-        const title = postTitle.value.trim();
-        const content = postContent.value.trim();
-
-        if (!type || !title || !content) {
-            responseMessage.innerHTML = '<div class="alert alert-danger">Compila tutti i campi.</div>';
-            return;
-        }
-        // Il controller si aspetta un oggetto content (array), qui usiamo un oggetto con titolo e testo
-        const body = {
-            type: type,
-            content: {
-            text: content,
-            title: title
-            }
-        };
-
-        try {
-            const token = localStorage.getItem('auth_token');
-            const res = await fetch('/api/posts/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify(body)
-            });
-
-            const data = await res.json();
-            if (res.ok) {
-                responseMessage.innerHTML = '<div class="alert alert-success">Post pubblicato con successo!</div>';
-                form.reset();
-                charCount.textContent = '0/500';
-            } else {
-                responseMessage.innerHTML = `<div class="alert alert-danger">${data.message || 'Errore nella pubblicazione.'}</div>`;
-            }
-        } catch (err) {
-            responseMessage.innerHTML = '<div class="alert alert-danger">Errore di rete.</div>';
-        }
-    });
-});
-
-</script>
 <body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- AUTOCOMPILE DA GET ---
+            function getQueryParams() {
+                const params = {};
+                window.location.search
+                    .substring(1)
+                    .split("&")
+                    .forEach(function (item) {
+                        if (!item) return;
+                        const [key, value] = item.split("=");
+                        if (key.endsWith("[]")) {
+                            const arrKey = key.slice(0, -2);
+                            params[arrKey] = params[arrKey] || [];
+                            params[arrKey].push(decodeURIComponent(value || ""));
+                        } else {
+                            params[key] = decodeURIComponent(value || "");
+                        }
+                    });
+                return params;
+            }
+        
+            const postType = document.getElementById('postType');
+            const postTitle = document.getElementById('postTitle');
+            const postContent = document.getElementById('postContent');
+            const charCount = document.getElementById('charCount');
+        
+            const params = getQueryParams();
+        
+            if (params.type && params.content) {
+                let type = params.type.toLowerCase();
+                let selected = params.selected ? params.selected.toLowerCase() : "";
+                let contentArr = Array.isArray(params.content) ? params.content : [params.content];
+                let title = "";
+                let text = "";
+        
+                if (type === "artista") type = "artist";
+                if (type === "brano" || type === "ascoltato_di_recente") type = "track";
+                if (type === "genere") type = "genre";
+        
+                function isLikelyDate(str) {
+                    return /\d{1,2}\/\d{1,2}\/\d{2,4}/.test(str) || /AM|PM/.test(str) || /\d{1,2}:\d{2}/.test(str);
+                }
+        
+                if (type === "artist") {
+                    if (contentArr.length > 1) {
+                        title = "Top Artisti";
+                        text = `Ecco i miei artisti preferiti del periodo:\n` +
+                            contentArr.map((a, i) => `${i + 1}. ${a}`).join('\n');
+                    } else {
+                        title = contentArr[0] || "Artista";
+                        text = `Il mio artista preferito è ${title}! 🎤`;
+                    }
+                } else if (type === "track") {
+                    if (selected === "toptrack" && contentArr.length > 2) {
+                        title = "Top Brani";
+                        let pairs = [];
+                        for (let i = 0; i < contentArr.length - 1; i += 2) {
+                            const track = contentArr[i];
+                            const artist = contentArr[i + 1];
+                            if (!isLikelyDate(artist)) {
+                                pairs.push({ track, artist });
+                            }
+                        }
+                        text = `Ecco le canzoni che sto ascoltando di più ultimamente:\n` +
+                            pairs.map((p, i) => `${i + 1}. "${p.track}" di ${p.artist}`).join('\n');
+                    }
+                    else if (selected === "recentlyplayed" && contentArr.length > 2) {
+                        title = "Brani ascoltati di recente";
+                        let pairs = [];
+                        for (let i = 0; i < contentArr.length - 1; i += 2) {
+                            const track = contentArr[i];
+                            const artistOrDate = contentArr[i + 1];
+                            if (!isLikelyDate(artistOrDate)) {
+                                pairs.push({ track, artist: artistOrDate });
+                            }
+                        }
+                        if (pairs.length === 0) {
+                            let lines = [];
+                            for (let i = 0; i < contentArr.length - 1; i += 2) {
+                                const track = contentArr[i];
+                                const date = contentArr[i + 1];
+                                lines.push(`${i / 2 + 1}. "${track}" il ${date}`);
+                            }
+                            text = `Ecco alcuni brani che ho ascoltato di recente:\n` + lines.join('\n');
+                        } else {
+                            text = `Ecco alcuni brani che ho ascoltato di recente:\n` +
+                                pairs.map((p, i) => `${i + 1}. "${p.track}" di ${p.artist}`).join('\n');
+                        }
+                    }
+                    else {
+                        title = contentArr[0] || "Brano";
+                        const artist = contentArr[1] && !isLikelyDate(contentArr[1]) ? contentArr[1] : "";
+                        if (selected === "toptrack") {
+                            text = `La mia canzone preferita è "${title}" di ${artist}! 🎶`;
+                        } else if (selected === "recentlyplayed") {
+                            text = `Ultimamente sto ascoltando "${title}" di ${artist}.`;
+                        } else {
+                            text = `Sto ascoltando "${title}"${artist ? " di " + artist : ""}!`;
+                        }
+                    }
+                } else if (type === "genre") {
+                    if (contentArr.length > 1) {
+                        title = "Top Generi";
+                        text = `Ecco i miei generi musicali preferiti:\n` +
+                            contentArr.map((g, i) => `${i + 1}. ${g}`).join('\n');
+                    } else {
+                        title = contentArr[0] || "Genere";
+                        text = `Il mio genere musicale preferito è ${title}! 🕺`;
+                    }
+                } else {
+                    title = contentArr[0] || "";
+                    text = contentArr.slice(1).join(", ");
+                }
+        
+                postType.value = type;
+                postTitle.value = title;
+                postContent.value = text;
+                charCount.textContent = `${text.length}/500`;
+            }
+        });
+        </script>
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-6 col-xl-5">
@@ -167,8 +225,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                     rows="4" 
                                     required 
                                     placeholder="Scrivi il contenuto del tuo post..."
-                                    maxlength="500">
-                                </textarea>
+                                    maxlength="500"
+                                    onfocus="this.setSelectionRange(0,0);"
+                                    onclick="this.setSelectionRange(0,0);"
+                                ></textarea>
                                 <div class="text-end mt-2">
                                     <small class="text-secondary" id="charCount">0/500</small>
                                 </div>
@@ -195,5 +255,68 @@ document.addEventListener('DOMContentLoaded', function () {
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('createPostForm');
+            if (!form) return;
+        
+            const postType = document.getElementById('postType');
+            const postTitle = document.getElementById('postTitle');
+            const postContent = document.getElementById('postContent');
+            const charCount = document.getElementById('charCount');
+            const responseMessage = document.getElementById('responseMessage');
+        
+            postContent.addEventListener('input', function () {
+                charCount.textContent = `${postContent.value.length}/500`;
+            });
+        
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                responseMessage.innerHTML = '';
+        
+                const type = postType.value;
+                const title = postTitle.value.trim();
+                const content = postContent.value.trim();
+        
+                if (!type || !title || !content) {
+                    responseMessage.innerHTML = '<div class="alert alert-danger">Compila tutti i campi.</div>';
+                    return;
+                }
+        
+                const body = {
+                    type: type,
+                    content: {
+                        title: title,
+                        text: content
+                    }
+                };
+        
+                try {
+                    const token = localStorage.getItem('auth_token');
+                    const res = await fetch('/api/posts/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify(body)
+                    });
+        
+                    const data = await res.json();
+                    if (res.ok) {
+                        responseMessage.innerHTML = '<div class="alert alert-success">Post pubblicato con successo!</div>';
+                        form.reset();
+                        charCount.textContent = '0/500';
+                    } else {
+                        responseMessage.innerHTML = `<div class="alert alert-danger">${data.message || 'Errore nella pubblicazione.'}</div>`;
+                    }
+                } catch (err) {
+                    responseMessage.innerHTML = '<div class="alert alert-danger">Errore di rete.</div>';
+                }
+            });
+        });
+        </script>
 </body>
 </html>

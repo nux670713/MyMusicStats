@@ -1,7 +1,7 @@
 
 $(document).ready(function () {
     function loginWithSpotify() {
-        fetch("http://127.0.0.1:8000/api/auth/api-token", {
+        fetch("/api/auth/api-token", {
             method: "GET",
             headers: {
                 Accept: "application/json",

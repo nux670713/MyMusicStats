@@ -23,9 +23,7 @@ navLinks.forEach((link) => {
         if (targetId === "post-feed") {
             loadPosts();
         }
-        if (targetId === "statistiche") {
-            loadStatistiche();
-        }
+        
         if (targetId == "web-api"){
             loadDeveloperPage();
         }
@@ -76,13 +74,7 @@ function loadDeveloperPage() {
                 <tr><td>GET</td><td><code>/api/posts/{id}/react/{reaction_type}</code></td><td>Aggiungi/aggiorna reazione a un post</td></tr>
                 <tr><td>GET</td><td><code>/api/posts/feed</code></td><td>Feed dei post tuoi e amici</td></tr>
                 <tr><td>GET</td><td><code>/api/post/{id}/MyReaction</code></td><td>La tua reazione a un post</td></tr>
-                <tr><td>GET</td><td><code>/api/statistiche/top-tracks</code></td><td>Top brani ascoltati</td></tr>
-                <tr><td>GET</td><td><code>/api/statistiche/top-artists</code></td><td>Top artisti ascoltati</td></tr>
-                <tr><td>GET</td><td><code>/api/statistiche/top-genres</code></td><td>Top generi ascoltati</td></tr>
-                <tr><td>GET</td><td><code>/api/statistiche/audio-features</code></td><td>Audio features dei tuoi brani</td></tr>
-                <tr><td>GET</td><td><code>/api/statistiche/audio-features-average</code></td><td>Media delle audio features</td></tr>
-                <tr><td>GET</td><td><code>/api/statistiche/extreme-tracks</code></td><td>Brani estremi per energia, felicità, acusticità</td></tr>
-            </tbody>
+                </tbody>
         </table>
         </div>
         <div class="alert alert-info">
@@ -118,162 +110,6 @@ function updateContainer(containerId, items, renderItem) {
         container.appendChild(element);
     });
 }
-
-async function loadStatistiche(timeRange = 'medium_term', limit = 20) {
-    const token = localStorage.getItem("auth_token");
-    if (!token) {
-        console.error("Token di autenticazione non trovato");
-        document.getElementById("statistiche").innerHTML = '<div class="alert alert-danger">Token di autenticazione non trovato. Effettua il login.</div>';
-        return;
-    }
-
-    const fetchApi = async (url, params = {}) => {
-        const queryParams = new URLSearchParams(params).toString();
-        const fullUrl = `${url}${queryParams ? `?${queryParams}` : ''}`;
-        
-        try {
-            const res = await fetch(fullUrl, {
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({ error: "Errore sconosciuto" }));
-                console.error(`Errore API (${res.status}):`, errorData);
-                return null;
-            }
-            
-            return res.json();
-        } catch (error) {
-            console.error(`Errore richiesta: ${url}`, error);
-            return null;
-        }
-    };
-
-    // Mostra loader
-    const container = document.getElementById("statistiche");
-    container.innerHTML = '<div class="text-center my-5"><div class="spinner-border" role="status"><span class="visually-hidden">Caricamento...</span></div></div>';
-
-    try {
-        // Carica tutte le statistiche in parallelo
-        const [
-            topTracks,
-            topArtists,
-            topGenres,
-            audioFeatures,
-            audioFeaturesAvg,
-            extremeTracks,
-        ] = await Promise.all([
-            fetchApi("/api/statistiche/top-tracks", { time_range: timeRange, limit }),
-            fetchApi("/api/statistiche/top-artists", { time_range: timeRange, limit }),
-            fetchApi("/api/statistiche/top-genres", { time_range: timeRange, limit }),
-            fetchApi("/api/statistiche/audio-features", { time_range: timeRange, limit: 50 }),
-            fetchApi("/api/statistiche/audio-features-average", { time_range: timeRange, limit }),
-            fetchApi("/api/statistiche/extreme-tracks", { time_range: timeRange, limit }),
-        ]);
-
-        // Se tutte le richieste falliscono, mostra un messaggio di errore
-        if (!topTracks && !topArtists && !topGenres && !audioFeatures && !audioFeaturesAvg && !extremeTracks) {
-            container.innerHTML = '<div class="alert alert-danger">Impossibile caricare le statistiche. Controlla la console per dettagli.</div>';
-            return;
-        }
-    container.innerHTML = `
-        <h1>Statistiche Musicali</h1>
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Top Brani</h4>
-                <ul id="stat-top-tracks"></ul>
-            </div>
-            <div class="col-md-6">
-                <h4>Top Artisti</h4>
-                <ul id="stat-top-artists"></ul>
-            </div>
-        </div>
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <h4>Top Generi</h4>
-                <ul id="stat-top-genres"></ul>
-            </div>
-            <div class="col-md-6">
-                <h4>Media Audio Features</h4>
-                <ul id="stat-audio-features-avg"></ul>
-            </div>
-        </div>
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <h4>Brani Estremi</h4>
-                <ul id="stat-extreme-tracks"></ul>
-            </div>
-        </div>
-    `;
-
-    const tracksList = document.getElementById("stat-top-tracks");
-    if (Array.isArray(topTracks)) {
-        topTracks.slice(0, 5).forEach((track) => {
-            const li = document.createElement("li");
-            li.innerHTML = `<strong>${track.name}</strong> di ${track.artists.join(", ")}`;
-            tracksList.appendChild(li);
-        });
-    }
-
-    const artistsList = document.getElementById("stat-top-artists");
-    if (Array.isArray(topArtists)) {
-        topArtists.slice(0, 5).forEach((artist) => {
-            const li = document.createElement("li");
-            li.innerHTML = `<strong>${artist.name}</strong> (${artist.genres.slice(0, 2).join(", ")})`;
-            artistsList.appendChild(li);
-        });
-    }
-
-    const genresList = document.getElementById("stat-top-genres");
-    if (Array.isArray(topGenres)) {
-        topGenres.forEach((genre) => {
-            const li = document.createElement("li");
-            li.textContent = `${genre.genre} (${genre.count})`;
-            genresList.appendChild(li);
-        });
-    }
-
-    const featuresList = document.getElementById("stat-audio-features-avg");
-    if (audioFeaturesAvg && typeof audioFeaturesAvg === "object" && !audioFeaturesAvg.error) {
-        Object.entries(audioFeaturesAvg).forEach(([key, value]) => {
-            const li = document.createElement("li");
-            li.textContent = `${key}: ${value}`;
-            featuresList.appendChild(li);
-        });
-    } else {
-        featuresList.innerHTML = '<li class="text-muted">Nessun dato disponibile</li>';
-    }
-
-    const extremeList = document.getElementById("stat-extreme-tracks");
-    if (extremeTracks && typeof extremeTracks === "object" && !extremeTracks.error) {
-        if (extremeTracks.piu_energetico) {
-            const t = extremeTracks.piu_energetico;
-            const li = document.createElement("li");
-            li.innerHTML = `Brano più energetico: <strong>${t.track.name}</strong> (${t.energy})`;
-            extremeList.appendChild(li);
-        }
-        if (extremeTracks.piu_felice) {
-            const t = extremeTracks.piu_felice;
-            const li = document.createElement("li");
-            li.innerHTML = `Brano più felice: <strong>${t.track.name}</strong> (${t.valence})`;
-            extremeList.appendChild(li);
-        }
-        if (extremeTracks.piu_acustico) {
-            const t = extremeTracks.piu_acustico;
-            const li = document.createElement("li");
-            li.innerHTML = `Brano più acustico: <strong>${t.track.name}</strong> (${t.acousticness})`;
-            extremeList.appendChild(li);
-        }
-    }
-        } catch (error) {
-            console.error("Errore nel caricamento delle statistiche:", error);
-            container.innerHTML = '<div class="alert alert-danger">Errore nel caricamento delle statistiche.</div>';
-        }
-    }
-
 
 // Funzione ricerca amici per nome utente
 const searchInput = document.getElementById("search-friend-input");
@@ -561,7 +397,7 @@ async function loadFriends() {
     }
 }
 
-// Funzione carica post (user-friendly)
+// Funzione carica post 
 async function loadPosts() {
     try {
         const res = await fetch("/api/posts/feed", {
@@ -594,29 +430,15 @@ async function loadPosts() {
                 minute: "2-digit",
             });
 
-            // Content rendering per tipo post
+            // Solo title e text
             let contentHtml = "";
-            if (post.type === "track") {
-                if (post.content.title && post.content.artist) {
-                    contentHtml = `
-                        <div>
-                            <span class="fw-bold">🎵 ${post.content.title}</span>
-                            <span class="text-secondary">di ${post.content.artist}</span>
-                        </div>
-                        ${post.content.album ? `<div class="text-muted small">Album: ${post.content.album}</div>` : ""}
-                    `;
-                } else if (post.content.message) {
-                    contentHtml = `<div>${post.content.message}</div>`;
-                }
-            } else if (post.type === "activity") {
-                contentHtml = `<div class="text-info">${post.content.text || ""}</div>`;
-            } else if (post.type === "status") {
-                contentHtml = `<div>${post.content.text || ""}</div>`;
-            } else {
-                // fallback
-                contentHtml = Object.entries(post.content || {})
-                    .map(([key, value]) => `<strong>${key}:</strong> ${value}`)
-                    .join("<br>");
+            const title = post.content?.title;
+            const text = post.content?.text;
+            if (title) {
+                contentHtml += `<div><span class="fw-bold">${title}</span></div>`;
+            }
+            if (text) {
+                contentHtml += `<div>${text}</div>`;
             }
 
             // Card DOM
@@ -631,7 +453,7 @@ async function loadPosts() {
                                 <span class="fw-semibold text-white">@${username}</span>
                                 <div class="text-secondary small">${formattedDate}</div>
                             </div>
-                            <span class="badge ms-auto ${post.type === "track" ? "bg-success" : post.type === "activity" ? "bg-primary" : "bg-secondary"}" style="font-size:0.8em;">
+                            <span class="badge ms-auto bg-secondary" style="font-size:0.8em;">
                                 ${post.type}
                             </span>
                         </div>
@@ -651,7 +473,7 @@ async function loadPosts() {
                             <div style="position:relative;">
                                 <img src="/assets/img/angry.png" alt="Angry" class="reaction-icon" data-reaction="angry" style="width:22px;height:22px;opacity:0.7;cursor:pointer;">
                             </div>
-                            <span class="ms-2 text-muted small">Reazioni: ${post.post_reactions_count || 0}</span>
+                            <span class="ms-2 text-white small">Reazioni: ${post.post_reactions_count || 0}</span>
                         </div>
                     </div>
                 </div>

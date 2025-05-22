@@ -11,7 +11,7 @@
         body {
             background-color: var(--dark-bg);
             color: var(--text-color);
-            font-family: 'Montserrat', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
         .navbar {

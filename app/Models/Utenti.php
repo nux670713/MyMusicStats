@@ -111,6 +111,8 @@ class Utenti extends Authenticatable
 			$this->token_expires_at = Carbon::now()->addSeconds($data['expires_in']);
 			$this->save();
 
+			\Log::info("Spotify access token refreshed successfully for user ID: {$this->id_utente}");
+
 			return $data['access_token'];
 		}
 

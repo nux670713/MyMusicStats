@@ -561,7 +561,7 @@ async function loadFriends() {
     }
 }
 
-// Funzione carica post
+// Funzione carica post (user-friendly)
 async function loadPosts() {
     try {
         const res = await fetch("/api/posts/feed", {
@@ -579,46 +579,85 @@ async function loadPosts() {
         const data = await res.json();
         const posts = data.posts;
 
-        // Usa updateContainer per aggiornare il contenitore dei post
         updateContainer("posts-feed-container", posts, (post) => {
+            // User info
+            const user = post.utenti || {};
+            const profilePic = user.profile_picture || "https://via.placeholder.com/48";
+            const username = user.username || "Utente";
+            // Data e ora
+            const date = new Date(post.created_at);
+            const formattedDate = date.toLocaleDateString("it-IT", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+
+            // Content rendering per tipo post
+            let contentHtml = "";
+            if (post.type === "track") {
+                if (post.content.title && post.content.artist) {
+                    contentHtml = `
+                        <div>
+                            <span class="fw-bold">🎵 ${post.content.title}</span>
+                            <span class="text-secondary">di ${post.content.artist}</span>
+                        </div>
+                        ${post.content.album ? `<div class="text-muted small">Album: ${post.content.album}</div>` : ""}
+                    `;
+                } else if (post.content.message) {
+                    contentHtml = `<div>${post.content.message}</div>`;
+                }
+            } else if (post.type === "activity") {
+                contentHtml = `<div class="text-info">${post.content.text || ""}</div>`;
+            } else if (post.type === "status") {
+                contentHtml = `<div>${post.content.text || ""}</div>`;
+            } else {
+                // fallback
+                contentHtml = Object.entries(post.content || {})
+                    .map(([key, value]) => `<strong>${key}:</strong> ${value}`)
+                    .join("<br>");
+            }
+
+            // Card DOM
             const card = document.createElement("div");
-            card.className = "col-md-6 mb-3";
-
-            // Mostra tipo e contenuto (estratto da oggetto JSON)
-            const contentHtml = Object.entries(post.content || {})
-                .map(([key, value]) => `<strong>${key}:</strong> ${value}`)
-                .join("<br>");
-
+            card.className = "col-12 mb-3";
             card.innerHTML = `
- <div class="card" style="background-color: #181818; border-radius: 8px; border: none; transition: background-color 0.3s ease; margin-bottom: 20px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);">
- <div class="card-body" style="padding: 16px;">
- <h5 class="card-title" style="color: #fff; font-weight: 700; font-size: 16px; margin-bottom: 12px;">Tipo: ${
-     post.type
- }</h5>
- <p class="card-text" style="color: #b3b3b3; font-size: 14px; margin-bottom: 16px;">${
-     contentHtml || "Nessun contenuto"
- }</p>
- <div class="reactions" style="position: relative; margin-top: 16px;">
- <div style="position: relative; display: inline-block; margin-right: 12px;">
- <img src="/assets/img/like.png" alt="Like" class="reaction-icon" data-reaction="like" style="width: 20px; height: 20px; opacity: 0.7; transition: transform 0.2s ease, opacity 0.2s ease;">
- </div>
- <div style="position: relative; display: inline-block; margin-right: 12px;">
- <img src="/assets/img/laugh.png" alt="Laugh" class="reaction-icon" data-reaction="laugh" style="width: 20px; height: 20px; opacity: 0.7; transition: transform 0.2s ease, opacity 0.2s ease;">
- </div>
- <div style="position: relative; display: inline-block; margin-right: 12px;">
- <img src="/assets/img/love.png" alt="Love" class="reaction-icon" data-reaction="love" style="width: 20px; height: 20px; opacity: 0.7; transition: transform 0.2s ease, opacity 0.2s ease;">
- </div>
- <div style="position: relative; display: inline-block;">
- <img src="/assets/img/angry.png" alt="Angry" class="reaction-icon" data-reaction="angry" style="width: 20px; height: 20px; opacity: 0.7; transition: transform 0.2s ease, opacity 0.2s ease;">
- </div>
- </div>
- <p class="mt-2" style="color: #b3b3b3; font-size: 12px; font-weight: 500;">Reazioni: ${
-     post.post_reactions_count || 0
- }</p>
- </div>
- </div>
- `;
-            // Aggiungi event listener per le reazioni
+                <div class="card shadow-sm" style="background-color: #181818; border-radius: 12px; border: none;">
+                    <div class="card-body pb-2">
+                        <div class="d-flex align-items-center mb-2">
+                            <img src="${profilePic}" alt="${username}" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;">
+                            <div>
+                                <span class="fw-semibold text-white">@${username}</span>
+                                <div class="text-secondary small">${formattedDate}</div>
+                            </div>
+                            <span class="badge ms-auto ${post.type === "track" ? "bg-success" : post.type === "activity" ? "bg-primary" : "bg-secondary"}" style="font-size:0.8em;">
+                                ${post.type}
+                            </span>
+                        </div>
+                        <div class="mb-2" style="color:#e0e0e0;font-size:1.08em;">
+                            ${contentHtml}
+                        </div>
+                        <div class="reactions d-flex align-items-center gap-2 mt-2">
+                            <div style="position:relative;">
+                                <img src="/assets/img/like.png" alt="Like" class="reaction-icon" data-reaction="like" style="width:22px;height:22px;opacity:0.7;cursor:pointer;">
+                            </div>
+                            <div style="position:relative;">
+                                <img src="/assets/img/laugh.png" alt="Laugh" class="reaction-icon" data-reaction="laugh" style="width:22px;height:22px;opacity:0.7;cursor:pointer;">
+                            </div>
+                            <div style="position:relative;">
+                                <img src="/assets/img/love.png" alt="Love" class="reaction-icon" data-reaction="love" style="width:22px;height:22px;opacity:0.7;cursor:pointer;">
+                            </div>
+                            <div style="position:relative;">
+                                <img src="/assets/img/angry.png" alt="Angry" class="reaction-icon" data-reaction="angry" style="width:22px;height:22px;opacity:0.7;cursor:pointer;">
+                            </div>
+                            <span class="ms-2 text-muted small">Reazioni: ${post.post_reactions_count || 0}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Event listener per le reazioni
             const reactionIcons = card.querySelectorAll(".reaction-icon");
             reactionIcons.forEach((icon) => {
                 icon.addEventListener("click", () => {
@@ -627,12 +666,11 @@ async function loadPosts() {
                 });
             });
 
-            // Fetch per ottenere la reazione dell'utente
+            // Mostra la reazione dell'utente (check)
             fetch(`/api/post/${post.id_post}/MyReaction`, {
                 headers: {
                     Accept: "application/json",
-                    Authorization:
-                        "Bearer " + localStorage.getItem("auth_token"),
+                    Authorization: "Bearer " + localStorage.getItem("auth_token"),
                 },
             })
                 .then((reactionRes) => {
@@ -644,13 +682,11 @@ async function loadPosts() {
                     ) {
                         return reactionRes.json();
                     }
-                    return null; // Nessuna reazione trovata
+                    return null;
                 })
                 .then((reactionData) => {
                     if (reactionData && reactionData.reaction) {
                         const userReaction = reactionData.reaction;
-
-                        // Aggiungi il check sopra la reazione selezionata
                         const selectedIcon = card.querySelector(
                             `.reaction-icon[data-reaction="${userReaction}"]`
                         );
@@ -660,11 +696,10 @@ async function loadPosts() {
                             checkIcon.alt = "Selected";
                             checkIcon.className = "reaction-check";
                             checkIcon.style.position = "absolute";
-                            checkIcon.style.top = "50%";
-                            checkIcon.style.left = "50%";
-                            checkIcon.style.transform = "translate(5%, 10%)";
-                            checkIcon.style.width = "20px";
-                            checkIcon.style.height = "20px";
+                            checkIcon.style.top = "-8px";
+                            checkIcon.style.right = "-8px";
+                            checkIcon.style.width = "16px";
+                            checkIcon.style.height = "16px";
                             selectedIcon.parentElement.appendChild(checkIcon);
                         }
                     }
@@ -676,7 +711,7 @@ async function loadPosts() {
                     );
                 });
 
-            return card; // Restituisci il nodo DOM
+            return card;
         });
     } catch (error) {
         console.error(error);

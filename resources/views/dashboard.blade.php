@@ -67,6 +67,9 @@
                         <img src=" {{ Auth::user()->profile_picture }} " alt="pfp" class="rounded-circle me-2" width="32"
                             height="32">
                         <span class="text-white">{{ Auth::user()->username }}</span>
+                        <a href="{{ route('crea-post') }}" class="btn btn-success mx-2">
+                            <i class="fas fa-plus"></i> Crea Post
+                        </a>
                         <button type="button" class="btn btn-outline-info me-lg-auto mx-3" id="logoutBtn">Logout</button>
                         <script>
                             document.getElementById('logoutBtn').addEventListener('click', async () => {
@@ -167,12 +170,9 @@
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-dark"
                                                         aria-labelledby="artistsDropdown">
+                                                        
                                                         <li>
-                                                            <a class="dropdown-item" href="#">Visualizza
-                                                                tutti</a>
-                                                        </li>
-                                                        <li>
-                                                            <a class="dropdown-item" href="#">Condividi</a>
+                                                            <a class="dropdown-item" href="{{ route('crea-post') }}">Condividi</a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -202,10 +202,7 @@
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-dark"
                                                         aria-labelledby="tracksDropdown">
-                                                        <li>
-                                                            <a class="dropdown-item" href="#">Visualizza
-                                                                tutti</a>
-                                                        </li>
+                                                        
                                                         <li>
                                                             <a class="dropdown-item" href="#">Condividi</a>
                                                         </li>
@@ -240,10 +237,7 @@
                                                         <li>
                                                             <a class="dropdown-item" href="#">Condividi</a>
                                                         </li>
-                                                        <li>
-                                                            <a class="dropdown-item" href="#">Visualizza
-                                                                dettagli</a>
-                                                        </li>
+                                                       
                                                     </ul>
                                                 </div>
                                             </div>
@@ -272,10 +266,7 @@
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-dark"
                                                         aria-labelledby="genresDropdown">
-                                                        <li>
-                                                            <a class="dropdown-item" href="#">Visualizza
-                                                                tutti</a>
-                                                        </li>
+                                                        
                                                         <li>
                                                             <a class="dropdown-item" href="#">Analisi
                                                                 dettagliata</a>

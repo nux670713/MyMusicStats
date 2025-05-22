@@ -11,12 +11,13 @@ use App\Models\BraniRecenti;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PostController;
 use SocialiteProviders\Manager\SocialiteWasCalled;
 use SocialiteProviders\Spotify\SpotifyExtendSocialite;
 use Laravel\Socialite\Contracts\Factory as SocialiteFactory;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\StatisticheController;
-
+use App\Models\Post;
 
 // Benvenuto
 Route::get('/', function () {
@@ -36,6 +37,9 @@ Route::post('/tokens/create', function (Request $request) {
     return ['token' => $token->plainTextToken];
 
 });
+
+//pagina crea post
+Route::get('/dashboard/create-post', [PostController::class, 'index'])->name("crea-post");
 
 // ---------------------------
 // ROTTE SPOTIFY

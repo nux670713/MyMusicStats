@@ -11,12 +11,12 @@ use App\Models\Utenti;
 
 class PostController extends Controller
 {
-    /**
-     * Crea un nuovo post.
-     */
-/**
- * Crea un nuovo post.
- */
+public function index(){
+    return view("posts.create");
+}
+
+
+
 public function createPost(Request $request)
 {
     if ($request->isMethod('post')) {
@@ -30,11 +30,7 @@ public function createPost(Request $request)
         $post = new Post();
         $post->id_utente = $user->id_utente;
         $post->type = $request->input('type');
-        $encodedContent = json_encode($request->input('content')); // Serializza il contenuto
-        if ($encodedContent === false) {
-            return response()->json(['message' => 'Errore nella serializzazione del contenuto.'], 400);
-        }
-        $post->content = $encodedContent; // Assegna direttamente la stringa JSON
+        $post->content = $request->input('content'); // Assegna direttamente l'array/oggetto JSON
         $post->save();
 
         return response()->json(['message' => 'Post creato con successo.', 'post' => $post], 201);

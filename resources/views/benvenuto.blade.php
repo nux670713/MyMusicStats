@@ -169,12 +169,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Funzionalità</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Contatti</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">Funzionalità</a></li>
                 </ul>
                 <div class="auth-buttons">
-                    <a class="btn btn-outline-primary me-2" href="#">Accedi</a>
-                    <a class="btn btn-primary" href="#">Inizia Gratis</a>
+                    <a class="btn btn-primary" href="{{ route('spotify.redirect') }}">Inizia Gratis</a>
                 </div>
             </div>
         </div>
@@ -190,11 +188,31 @@
                         amici. Il tutto sincronizzato con Spotify.</p>
                     <div class="d-flex">
                         <a href="{{ route('spotify.redirect') }}" class="btn btn-primary me-3">Collega Spotify</a>
-                        <a href="#" class="btn btn-outline-primary">Esplora le funzionalità</a>
+                        <a href="#features" class="btn btn-outline-primary">Esplora le funzionalità</a>
                     </div>
                 </div>
                 <div class="col-lg-6 mt-5 mt-lg-0">
-                    <img src="/api/placeholder/600/400" alt="Dashboard MyMusicStats" class="img-fluid rounded-3 shadow">
+                    <svg viewBox="0 0 600 400" width="100%" height="auto" class="img-fluid rounded-3 shadow" style="background:#181818;">
+                        <!-- Axes -->
+                        <line x1="60" y1="350" x2="560" y2="350" stroke="#B3B3B3" stroke-width="2"/>
+                        <line x1="60" y1="50" x2="60" y2="350" stroke="#B3B3B3" stroke-width="2"/>
+                       
+                        <rect x="80"  y="260" width="22" height="90"  fill="#1DB954" rx="2"/>
+                        <rect x="110" y="180" width="22" height="170" fill="#4F46E5" rx="2"/>
+                        <rect x="140" y="220" width="22" height="130" fill="#F59E42" rx="2"/>
+                        <rect x="170" y="120" width="22" height="230" fill="#E53E3E" rx="2"/>
+                        <rect x="200" y="200" width="22" height="150" fill="#38BDF8" rx="2"/>
+                        <rect x="230" y="140" width="22" height="210" fill="#A21CAF" rx="2"/>
+                        <rect x="260" y="170" width="22" height="180" fill="#FBBF24" rx="2"/>
+                        <rect x="290" y="90"  width="22" height="260" fill="#10B981" rx="2"/>
+                        <rect x="320" y="240" width="22" height="110" fill="#6366F1" rx="2"/>
+                        <rect x="350" y="210" width="22" height="140" fill="#F472B6" rx="2"/>
+                        <rect x="380" y="130" width="22" height="220" fill="#F87171" rx="2"/>
+                        <rect x="410" y="170" width="22" height="180" fill="#34D399" rx="2"/>
+                        <rect x="440" y="250" width="22" height="100" fill="#FBBF24" rx="2"/>
+                        <rect x="470" y="110" width="22" height="240" fill="#3B82F6" rx="2"/>
+                        <rect x="500" y="200" width="22" height="150" fill="#A3E635" rx="2"/>
+                    </svg>
                 </div>
             </div>
         </div>
@@ -204,7 +222,7 @@
     <section class="features">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="mb-4">Cosa puoi fare con MyMusicStats</h2>
+                <h2 id="features" class="mb-4">Cosa puoi fare con MyMusicStats</h2>
                 <p class="text-secondary col-lg-8 mx-auto">Monitora i tuoi ascolti, confrontali con i tuoi amici,
                     esplora i tuoi artisti top e molto altro.</p>
             </div>
@@ -221,8 +239,8 @@
                 </div>
                 <div class="col-md-4 mb-4 text-center">
                     <div class="feature-icon"><i class="fas fa-music"></i></div>
-                    <h4>Playlist Intelligenti</h4>
-                    <p class="text-secondary">Analisi automatica delle tue playlist preferite.</p>
+                    <h4>Analisi Dei Tuoi Dati</h4>
+                    <p class="text-secondary">Analisi automatica delle tue canzoni preferite.</p>
                 </div>
             </div>
         </div>
@@ -233,7 +251,7 @@
         <div class="cta-section text-center text-white">
             <h2 class="mb-4">Unisciti alla community musicale</h2>
             <p class="mb-4">Inizia oggi a tracciare e condividere la tua esperienza musicale.</p>
-            <a href="#" class="btn btn-light btn-lg">Crea un Account Gratuito</a>
+            <a href="{{ route('spotify.redirect') }}" class="btn btn-light btn-lg">Crea un Account Gratuito</a>
         </div>
     </section>
 

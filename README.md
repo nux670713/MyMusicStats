@@ -8,7 +8,7 @@ MyMusicStats è un'applicazione web che permette agli utenti di visualizzare sta
 - Dashboard personale con statistiche musicali
 - Cronologia ascolti e classifiche personalizzate
 - Funzionalità social (post, like, amicizie)
-- Dati sincronizzati con Spotify ma salvati in un database per minimizzare le richieste
+- Dati sincronizzati con Spotify ma salvati nel database per minimizzare le richieste
 - API rest protette da sanctum (descritte anche nella sezione per sviluppatori della dashboard)
 ---
 

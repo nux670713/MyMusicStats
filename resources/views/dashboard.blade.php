@@ -238,6 +238,24 @@
                                     <button class="btn btn-sm btn-dark" id="refresh-recent">
                                         <i class="fas fa-sync-alt"></i> Aggiorna
                                     </button>
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                            document.getElementById('refresh-recent').addEventListener('click', async function() {
+                                                try {
+                                                    const token = localStorage.getItem('auth_token');
+                                                    const response = await fetch('/api/spotify/renew', {
+                                                        method: 'GET',
+                                                        headers: {
+                                                            'Accept': 'application/json',
+                                                            'Authorization': `Bearer ${token}`
+                                                        }
+                                                    });
+                                                    location.reload();
+                                                } catch (e) {
+                                                }
+                                            });
+                                        });
+                                    </script>
                                 </div>
 
                                 <div class="row">

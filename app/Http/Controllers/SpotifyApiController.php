@@ -16,20 +16,21 @@ use PHPUnit\TextUI\XmlConfiguration\RenameBeStrictAboutCoversAnnotationAttribute
 class SpotifyApiController extends Controller
 {
 
-    public function renewData($force=false){
+    public function renewData($force = false)
+    {
         //tronca tutti i dati dell'utente
         //se updated_at dello user è maggiore di 24 ore
         $user = Auth::user();
         $userId = $user->id_utente;
         $lastUpdate = Utenti::where('id_utente', $userId)->first();
-        if ($lastUpdate && $lastUpdate->updated_at->diffInHours(now()) > 24 || $force) {
+        if (($lastUpdate && $lastUpdate->updated_at->diffInHours(now()) > 24) || $force) {
             DB::table('brani_recenti')->where('id_utente', $userId)->delete();
             DB::table('top_artists')->where('id_utente', $userId)->delete();
             DB::table('top_tracks')->where('id_utente', $userId)->delete();
             DB::table('generi')->where('id_utente', $userId)->delete();
         }
-        
-        }
+
+    }
 
     public function topTracks()
     {
@@ -132,7 +133,7 @@ class SpotifyApiController extends Controller
         $this->renewData();
 
 
-        $topArtists=TopArtist::where('id_utente', '=', $user->id_utente)->where('time_range', '=', $timeRange)->orderBy('rank', 'asc')->take($limit)->get();
+        $topArtists = TopArtist::where('id_utente', '=', $user->id_utente)->where('time_range', '=', $timeRange)->orderBy('rank', 'asc')->take($limit)->get();
         if ($topArtists->count() > 0) {
             $response = [
                 'items' => $topArtists->map(function ($artist) {

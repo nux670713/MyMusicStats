@@ -43,7 +43,7 @@ DB_PASSWORD=tuo_password
 
 SPOTIFY_CLIENT_ID=tuo_client_id
 SPOTIFY_CLIENT_SECRET=tuo_client_secret
-SPOTIFY_REDIRECT_URI=http://localhost/callback/spotify
+SPOTIFY_REDIRECT_URI=http://127.0.0.1:8000/auth/spotify/callback
 
 ## 3. Generazione chiavi e migrazione database
 

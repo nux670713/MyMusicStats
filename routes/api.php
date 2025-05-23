@@ -18,7 +18,9 @@ Route::middleware('auth:sanctum')->post('/logout', function (Request $request) {
 
 // API protette da Sanctum
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/spotify/renew', [SpotifyApiController::class, 'renewData', true]);
+    Route::get('/spotify/renew', function () {
+        return app(SpotifyApiController::class)->renewData(true);
+    });
     Route::get('/spotify/top-tracks', [SpotifyApiController::class, 'topTracks']);
     Route::get('/spotify/top-artists', [SpotifyApiController::class, 'topArtists']);
     Route::get('/spotify/recently-played', [SpotifyApiController::class, 'recentlyPlayed']);

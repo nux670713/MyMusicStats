@@ -18,7 +18,7 @@ class SpotifyApiController extends Controller
 
     public function renewData($force=false){
         //tronca tutti i dati dell'utente
-        //se il updated_at dello user è maggiore di 24 ore
+        //se updated_at dello user è maggiore di 24 ore
         $user = Auth::user();
         $userId = $user->id_utente;
         $lastUpdate = Utenti::where('id_utente', $userId)->first();

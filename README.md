@@ -45,6 +45,8 @@ SPOTIFY_CLIENT_ID=tuo_client_id
 SPOTIFY_CLIENT_SECRET=tuo_client_secret
 SPOTIFY_REDIRECT_URI=http://127.0.0.1:8000/auth/spotify/callback
 
+(lascio comunque il mio .env senza client_id e client_secret)
+
 ## 3. Generazione chiavi e migrazione database
 
 php artisan key:generate
@@ -61,9 +63,12 @@ L'app sarà disponibile su http://localhost:8000.
 
     Crea un'applicazione
 
-    Inserisci il redirect URI esatto configurato in .env, es: http://localhost/callback/spotify
+    Inserisci il redirect URI esatto configurato in .env: http://127.0.0.1:8000/auth/spotify/callback
 
     Copia Client ID e Secret nel file .env
+
+### Nota: 
+una volta creata la web app sul sito di spotify, è necessario ammettere a mano tutti gli utenti (tranne sè stessi) che dovranno accedere al sito, entrando nella Dashboard, selezionando la scheda "User Management" e inserendo l'email dell'account che potrà accedere in modalità di sviluppo
 
 ## 6. Comportamento dei dati
 
@@ -81,7 +86,7 @@ L'app sarà disponibile su http://localhost:8000.
 
     posts
 
-    post_likes
+    post_reactions
 
     brani_recenti
 
@@ -90,3 +95,4 @@ L'app sarà disponibile su http://localhost:8000.
     top_tracks
 
     top_artists
+

@@ -23,24 +23,27 @@
         <link href="/assets/css/dashboard.css" rel="stylesheet">
     </head>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             // Condividi Top Artisti (passa tutta la lista)
             document.querySelectorAll('.share-top-artists').forEach(btn => {
-                btn.addEventListener('click', function (e) {
+                btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     // Prendi tutti i nomi degli artisti dalla lista
                     const artistEls = document.querySelectorAll('#top-artists .artist-info p');
-                    const artists = Array.from(artistEls).map(el => el.textContent.trim()).filter(Boolean);
+                    const artists = Array.from(artistEls).map(el => el.textContent.trim()).filter(
+                        Boolean);
                     if (artists.length) {
-                        const params = artists.map(a => `content[]=${encodeURIComponent(a)}`).join('&');
-                        window.location.href = `{{ route('crea-post') }}?selected=topartist&type=artista&${params}`;
+                        const params = artists.map(a => `content[]=${encodeURIComponent(a)}`).join(
+                            '&');
+                        window.location.href =
+                            `{{ route('crea-post') }}?selected=topartist&type=artista&${params}`;
                     }
                 });
             });
-        
+
             // Condividi Top Brani (passa tutta la lista: titolo e artista alternati)
             document.querySelectorAll('.share-top-tracks').forEach(btn => {
-                btn.addEventListener('click', function (e) {
+                btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     // Prendi tutti i brani dalla lista
                     const trackEls = document.querySelectorAll('#top-tracks .track-info p');
@@ -53,15 +56,17 @@
                         }
                     });
                     if (tracks.length) {
-                        const params = tracks.map(t => `content[]=${encodeURIComponent(t)}`).join('&');
-                        window.location.href = `{{ route('crea-post') }}?selected=toptrack&type=brano&${params}`;
+                        const params = tracks.map(t => `content[]=${encodeURIComponent(t)}`).join(
+                            '&');
+                        window.location.href =
+                            `{{ route('crea-post') }}?selected=toptrack&type=brano&${params}`;
                     }
                 });
             });
-        
+
             // Condividi Ascoltati di Recente (passa tutta la lista: titolo e artista alternati)
             document.querySelectorAll('.share-recent-track').forEach(btn => {
-                btn.addEventListener('click', function (e) {
+                btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     // Prendi tutti i brani ascoltati di recente
                     const trackEls = document.querySelectorAll('#recently-played .track-info p');
@@ -74,34 +79,35 @@
                         }
                     });
                     if (tracks.length) {
-                        const params = tracks.map(t => `content[]=${encodeURIComponent(t)}`).join('&');
-                        window.location.href = `{{ route('crea-post') }}?selected=recentlyplayed&type=ascoltato_di_recente&${params}`;
+                        const params = tracks.map(t => `content[]=${encodeURIComponent(t)}`).join(
+                            '&');
+                        window.location.href =
+                            `{{ route('crea-post') }}?selected=recentlyplayed&type=ascoltato_di_recente&${params}`;
                     }
                 });
             });
-        
+
             // Condividi Top Generi (passa tutta la lista)
             document.querySelectorAll('.share-top-genre').forEach(btn => {
-                btn.addEventListener('click', function (e) {
+                btn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    // Prendi tutti i generi dalla legenda o dalla lista
-                    // Adatta il selettore secondo la tua struttura
-                    const genreEls = document.querySelectorAll('#genres-chart .legend-label, #genres-chart li, #genres-chart span');
-                    const genres = Array.from(genreEls).map(el => el.textContent.trim()).filter(Boolean);
-                    // Se non trovi nulla, prova a prendere le chiavi da un oggetto JS globale (es. window.lastGenres)
-                    if (!genres.length && window.lastGenres) {
-                        for (const g in window.lastGenres) {
-                            genres.push(g);
-                        }
+                    // Usa window.lastGenres per ottenere i generi
+                    let genres = [];
+                    if (window.lastGenres) {
+                        genres = Object.keys(window.lastGenres);
                     }
                     if (genres.length) {
-                        const params = genres.map(g => `content[]=${encodeURIComponent(g)}`).join('&');
-                        window.location.href = `{{ route('crea-post') }}?selected=genere&type=genere&${params}`;
+                        const params = genres.map(g => `content[]=${encodeURIComponent(g)}`).join(
+                            '&');
+                        window.location.href =
+                            `{{ route('crea-post') }}?selected=genere&type=genere&${params}`;
+                    } else {
+                        alert("Nessun genere trovato da condividere!");
                     }
                 });
             });
         });
-        </script>
+    </script>
 
     <body>
         <!-- Navbar -->
@@ -136,16 +142,18 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-dark p-2 text-white" style="width: 250px;"
                                 id="friend-request-list">
-                                <li><span class="dropdown-item-text text-white">Nessuna richiesta di amicizia</span></li>
+                                <li><span class="dropdown-item-text text-white">Nessuna richiesta di amicizia</span>
+                                </li>
                             </ul>
                         </div>
-                        <img src=" {{ Auth::user()->profile_picture }} " alt="pfp" class="rounded-circle me-2" width="32"
-                            height="32">
+                        <img src=" {{ Auth::user()->profile_picture }} " alt="pfp" class="rounded-circle me-2"
+                            width="32" height="32">
                         <span class="text-white">{{ Auth::user()->username }}</span>
                         <a href="{{ route('crea-post') }}" class="btn btn-success mx-2">
                             <i class="fas fa-plus"></i> Crea Post
                         </a>
-                        <button type="button" class="btn btn-outline-info me-lg-auto mx-3" id="logoutBtn">Logout</button>
+                        <button type="button" class="btn btn-outline-info me-lg-auto mx-3"
+                            id="logoutBtn">Logout</button>
                         <script>
                             document.getElementById('logoutBtn').addEventListener('click', async () => {
                                 const token = localStorage.getItem('auth_token');
@@ -165,7 +173,7 @@
 
                                 // Rimuovi token dal localStorage e reindirizza o aggiorna
                                 localStorage.removeItem('auth_token');
-                                window.location.href = '/'; 
+                                window.location.href = '/';
                             });
                         </script>
                     </div>
@@ -183,18 +191,20 @@
                             <h5 class="mb-3">Menu</h5>
                             <a href="#dashboard" class="sidebar-link nav-link-page active"><i class="fas fa-home"></i>
                                 Dashboard</a>
-                               
+
                             <h5 class="mt-4 mb-3">Social</h5>
                             <a href="#ricerca-amici" class="sidebar-link nav-link-page"><i class="fas fa-user-plus"></i>
                                 Ricerca Amici</a>
                             <a href="#lista-amici" class="sidebar-link nav-link-page"><i
                                     class="fas fa-user-friends"></i> I tuoi Amici</a>
-                            <a href="#post-feed" class="sidebar-link nav-link-page mb-3"><i class="fas fa-newspaper"></i>
+                            <a href="#post-feed" class="sidebar-link nav-link-page mb-3"><i
+                                    class="fas fa-newspaper"></i>
                                 Post Feed</a>
-                            <a href="#web-api" class="sidebar-link nav-link-page border-bottom-0"><i class="fas fa-code"></i>
+                            <a href="#web-api" class="sidebar-link nav-link-page border-bottom-0"><i
+                                    class="fas fa-code"></i>
                                 Sviluppatori</a>
                         </div>
-                        
+
                     </div>
 
                     <!-- Content Area -->
@@ -221,7 +231,7 @@
                                     <div class="filter-option" data-period="long_term">Anno</div>
                                 </div>
 
-                                
+
 
                                 <div class="section-header">
                                     <h2>Le Tue Top Statistiche</h2>
@@ -245,7 +255,8 @@
                                                     <ul class="dropdown-menu dropdown-menu-dark"
                                                         aria-labelledby="artistsDropdown">
                                                         <li>
-                                                            <a class="dropdown-item share-top-artists" href="#">Condividi</a>
+                                                            <a class="dropdown-item share-top-artists"
+                                                                href="#">Condividi</a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -276,7 +287,8 @@
                                                     <ul class="dropdown-menu dropdown-menu-dark"
                                                         aria-labelledby="tracksDropdown">
                                                         <li>
-                                                            <a class="dropdown-item share-top-tracks" href="#">Condividi</a>
+                                                            <a class="dropdown-item share-top-tracks"
+                                                                href="#">Condividi</a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -309,7 +321,7 @@
                                                         <li>
                                                             <a class="dropdown-item share-recent-track">Condividi</a>
                                                         </li>
-                                                       
+
                                                     </ul>
                                                 </div>
                                             </div>
@@ -338,9 +350,10 @@
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-dark"
                                                         aria-labelledby="genresDropdown">
-                                                        
+
                                                         <li>
-                                                            <a class="dropdown-item share-top-genre" href="#">Condividi</a>
+                                                            <a class="dropdown-item share-top-genre"
+                                                                href="#">Condividi</a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -363,7 +376,7 @@
 
                         </div>
 
-                        
+
 
                         <div id="ricerca-amici" class="page-section" style="display:none;">
                             <h1>Ricerca Amici</h1>
@@ -386,16 +399,16 @@
                             <h1>Web API</h1>
                             <p>Scopri come utilizzare le nostre API per accedere ai tuoi dati musicali.</p>
 
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+            <!-- Bootstrap JS -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-        <!-- Navigazione e API -->
-        <script src="/assets/js/social.js"></script>
+            <!-- Navigazione e API -->
+            <script src="/assets/js/social.js"></script>
     </body>
 
 </html>

@@ -80,13 +80,19 @@ $(document).ready(function () {
 
     // Rimuove loader e avvia sezione render
     function renderDashboard(data) {
-         
         $("#card-body").empty();
         $(".loading").hide();
         renderRecentlyPlayed(data.recently_played);
         renderTopTracks(data.top_tracks);
         renderTopArtists(data.top_artists);
         renderTopGenres(data.top_genres);
+        // Esporta i generi in una variabile globale per la condivisione
+        window.lastGenres = Object.entries(data.top_genres)
+            .slice(0, 5)
+            .reduce((acc, [key, value]) => {
+                acc[key] = value;
+                return acc;
+            }, {});
     }
 
     function fetchData(url) {

@@ -213,7 +213,7 @@ async function loadFriends() {
         });
          
         const data = await res.json();
-        const friends = data.friends || [];
+        const friends = Array.isArray(data.friends) ? data.friends : [];
 
         // Ottieni il container
         const friendsContainer = document.getElementById("friends-list");
